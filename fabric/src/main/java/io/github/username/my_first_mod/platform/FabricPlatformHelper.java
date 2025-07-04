@@ -37,7 +37,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public <T, U extends T> DeferredRegistryObject<U> register(Registry<T> objRegistry, String objName, Supplier<U> objSupplier) {
-        return new FabricDeferredRegistryObject<>(Registry.register(objRegistry, new ResourceLocation(Constants.MOD_ID), objSupplier.get()));
+        return new FabricDeferredRegistryObject<>(Registry.register(objRegistry, new ResourceLocation(Constants.MOD_ID, objName), objSupplier.get()));
     }
 
     @Override @SuppressWarnings("unchecked")
