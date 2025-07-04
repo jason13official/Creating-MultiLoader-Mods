@@ -51,5 +51,10 @@ public interface IPlatformHelper {
      */
     <T, U extends T> DeferredRegistryObject<U> registerItem(String objName, Supplier<U> objSupplier);
 
+    /**
+     * Gets the mod-loader's preferred method of building a new CreativeModeTab.
+     *
+     * @return A fresh CreativeModeTab.Builder instance as supplied by the mod loader.
+     */
     CreativeModeTab.Builder tabBuilder();
 }

@@ -8,7 +8,7 @@ public class MyFirstModFabric implements ModInitializer {
     public void onInitialize() {
 
         // calling init here calls loadClass in the classes we've defined.
-        // since our FabricPlatformHelper is directly registering objects, we're done here.
+        // Our FabricPlatformHelper is directly registering objects.
         MyFirstMod.init();
     }
 }
