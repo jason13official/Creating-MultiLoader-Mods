@@ -14,7 +14,7 @@ public class MyFirstModForge {
         // however, our ForgePlatformHelper is only adding our objects to Forge's deferred registries
         MyFirstMod.init();
 
-        // here, we are linking our defined registries to our mod event bus, so that Forge can handle registration for us.
+        // here, we are linking our deferred registries to our mod event bus, so that Forge can handle registration for us.
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ForgeRegistryHelper.BLOCK.register(modEventBus);
         ForgeRegistryHelper.ITEMS.register(modEventBus);

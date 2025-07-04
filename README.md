@@ -1,24 +1,174 @@
-# MultiLoader Template
+This gist serves as a non-exhaustive, high-level overview of implementing [MultiLoader-Template](https://github.com/jaredlll08/MultiLoader-Template),
+which was created by jaredlll08 and contributors in 2021 for [Hacktoberfest](https://github.com/topics/hacktoberfest).
 
-This project provides a Gradle project template that can compile mods for both Forge and Fabric using a common sourceset. This project does not require any third party libraries or dependencies. If you have any questions or want to discuss the project join our [Discord](https://discord.myceliummod.network).
+> Trivia: Specifically, the first commit to MultiLoader-Template was [a Markdown file simply reading "FabricForgeTogether"](https://github.com/jaredlll08/MultiLoader-Template/commit/e5e55290ea2795de293ac7c698592bc79a7635a7),
+> which was committed by jaredlll08 on Jul 23, 2021!
 
-## Getting Started
+Only official mojang mappings are used in this gist.
 
-## IntelliJ IDEA
-This guide will show how to import the MultiLoader Template into IntelliJ IDEA. The setup process is roughly equivalent to setting up Forge and Fabric independently and should be very familiar to anyone who has worked with their MDKs.
+We are targeting 1.20.1 as the Minecraft version of our mod.
+---
 
-1. Clone or download this repository to your computer.
-2. Configure the project by editing the `group`, `mod_name`, `mod_author`, and `mod_id` properties in the `gradle.properties` file. You will also need to change the `rootProject.name`  property in `settings.gradle`, this should match the folder name of your project, or else IDEA may complain.
-3. Open the template's root folder as a new project in IDEA. This is the folder that contains this README file and the gradlew executable.
-4. If your default JVM/JDK is not Java 17 you will encounter an error when opening the project. This error is fixed by going to `File > Settings > Build, Execution, Deployment > Build Tools > Gradle > Gradle JVM`and changing the value to a valid Java 17 JVM. You will also need to set the Project SDK to Java 17. This can be done by going to `File > Project Structure > Project SDK`. Once both have been set open the Gradle tab in IDEA and click the refresh button to reload the project.
-5. Open the Gradle tab in IDEA if it has not already been opened. Navigate to `Your Project > Common > Tasks > vanilla gradle > decompile`. Run this task to decompile Minecraft.
-6. Open your Run/Debug Configurations. Under the Application category there should now be options to run Forge and Fabric projects. Select one of the client options and try to run it.
-7. Assuming you were able to run the game in step 7 your workspace should now be set up.
+### Development Environment Details
 
-### Eclipse
-While it is possible to use this template in Eclipse it is not recommended. During the development of this template multiple critical bugs and quirks related to Eclipse were found at nearly every level of the required build tools. While we continue to work with these tools to report and resolve issues support for projects like these are not there yet. For now Eclipse is considered unsupported by this project. The development cycle for build tools is notoriously slow so there are no ETAs available.
+- JetBrain's IDE, [IntelliJ IDEA Community Edition](https://www.jetbrains.com/idea/download)
+- Eclipse Adoptium's open-source JDK,  [*Temurin*](https://adoptium.net/temurin/releases)
 
-## Development Guide
-When using this template the majority of your mod is developed in the Common project. The Common project is compiled against the vanilla game and is used to hold code that is shared between the different loader-specific versions of your mod. The Common project has no knowledge or access to ModLoader specific code, apis, or concepts. Code that requires something from a specific loader must be done through the project that is specific to that loader, such as the Forge or Fabric project.
+You can begin by cloning, forking, or directly downloading the [MultiLoader-Template](https://github.com/jaredlll08/MultiLoader-Template) repository.
 
-Loader specific projects such as the Forge and Fabric project are used to load the Common project into the game. These projects also define code that is specific to that loader. Loader specific projects can access all of the code in the Common project. It is important to remember that the Common project can not access code from loader specific projects.
+Optionally, [GitKraken Desktop](https://www.gitkraken.com/git-client) is helpful for working with git worktrees. You can also use GitHub Desktop to clone the repository and push changes to a repository easily.
+In either case, make sure the `rootProject.name` property in `settings.gradle` matches the name of the root folder.
+
+<!-- Can someone add info about usng the publishing plugins?? -->
+
+<!-- [**Forgix**](https://github.com/PacifistMC/Forgix) is used at the end of our project to combine our Fabric and (Neo)Forge files into a single merged jar.-->
+
+---
+
+### YOU ARE HERE: Java is installed, IntelliJ IDEA is open to your clone of MultiLoader-Template
+
+For the purposes of this tutorial, we are using the fully-qualified namespace `io.github.username.my_first_mod`, and the mod ID of `my_first_mod`.
+
+To begin, we must refactor the mod (tip: SHIFT+F6 to refactor a top-level class name will rename the file as well). This is the practice of replacing every instance of `com.example.examplemod` with our preferred namespace, and the same with any instance of `examplemod` to use our mod ID. Make sure to update mixin files as well as fabric.mod.json and Constants.java
+
+It's also suggested to rename the entrypoint classes, instead of `CommonClass` and `ExampleMod` in both the fabric and forge module, let's rename them respectively to
+MyFirstMod, MyFirstModFabric, and MyFirstModForge. You can/should follow this pattern for most files. Now we have:
+
+- `MyFirstMod`, in the `common` module, which is invoked by our mod-loader entrypoints via `MyFirstMod#init()`
+- `MyFirstModFabric`, in the `fabric` module, which implements `ModInitializer` and it linked in our fabric.mod.json file as an entrypoint
+- `MyFirstModForge`, in the `forge` module, which is annotated with `@Mod` and contains a parameterless constructor as our Forge entrypoint.
+
+> Tip: To ensure that you don't miss replacing any occurence of a string in your project, double-tap SHIFT to bring up a search bar
+
+---
+
+### Registering objects to Minecraft's registries
+
+*Preface: Fabric (Neo)Forge delay/defer registration of objects to Minecraft's built-in registries to ensure that objects are registered at the right time and in the correct order. 
+In practice, this means we want to define Supplier-like objects with a reference to the underlying object being registered.
+There are multiple libraries that can handle this functionality for us, such as [RegistrationUtils](https://github.com/Matyrobbrt/RegistrationUtils) and [Bookshelf](https://github.com/Darkhax-Minecraft/Bookshelf),
+but we are going to implement a barebones system described by [Silk](https://github.com/TheSilkMiner). over a Discord chat.*
+
+In our `common` module, we will create a class with the fully-qualified class path of `io.github.username.my_first_mod.core.util.DeferredRegistryObject` as follows:
+```Java
+public interface DeferredRegistryObject<T> extends Supplier<T> {
+    
+    T get(); // not required, provided by extending Supplier
+}
+```
+
+This interface allows us to create custom implementations of our registry object for each mod loader,
+which we will create in our `fabric` and `forge` modules with the class paths of:
+
+- io.github.username.my_first_mod.core.util.FabricDeferredRegistryObject;
+- io.github.username.my_first_mod.core.util.ForgeDeferredRegistryObject;
+
+
+```Java
+public class FabricDeferredRegistryObject<T> implements DeferredRegistryObject<T> {
+
+    private final T obj;
+
+    public FabricDeferredRegistryObject(T obj) {
+        this.obj = obj;
+    }
+
+    public T get() {
+        return this.obj;
+    }
+}
+```
+
+```Java
+import net.minecraftforge.registries.RegistryObject;
+
+public class ForgeDeferredRegistryObject<T> implements DeferredRegistryObject<T> {
+
+    private final RegistryObject<T> objHolder;
+
+    public ForgeDeferredRegistryObject(RegistryObject<T> objHolder) {
+        this.objHolder = objHolder;
+    }
+
+    public T get() {
+        return this.objHolder.get();
+    }
+}
+```
+
+*Note how the Forge implementation is directly holding another holder, rather than the underlying registered object.
+In practice, we will still use the DeferredRegistryObject in the same fashion.*
+
+Creation of new DeferredRegistryObjects will be handled via platform helpers, with Fabric being straight-forward and Forge having a small caveat.
+
+In `common`, we'll add the following method to our IPlatformHelper interface:
+```Java
+<T, U extends T> DeferredRegistryObject<U> register(Registry<T> objRegistry, String objName, Supplier<U> objSupplier);
+```
+
+With the following implementations in Fabric and Forge:
+```Java
+public <T, U extends T> DeferredRegistryObject<U> register(Registry<T> objRegistry, String objName, Supplier<U> objSupplier) {
+    return new FabricDeferredRegistryObject<>(Registry.register(objRegistry, new ResourceLocation(Constants.MOD_ID), objSupplier.get()));
+}
+```
+```Java
+public <T, U extends T> DeferredRegistryObject<U> register(Registry<T> objRegistry, String objName, Supplier<U> objSupplier) {
+    DeferredRegister<T> registry = ForgeRegistryHelper.deferredRegisterFor(objRegistry);
+    return new ForgeDeferredRegistryObject<>(registry.register(objName, objSupplier));
+}
+```
+
+Note the usage of `ForgeRegistryHelper`, which is a custom class for retrieving the proper mod registry:
+```Java
+public class ForgeRegistryHelper {
+
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Constants.MOD_ID);
+    public static final DeferredRegister<Block> BLOCK = DeferredRegister.create(ForgeRegistries.BLOCKS, Constants.MOD_ID);
+
+    @SuppressWarnings("unchecked")
+    public static <T> DeferredRegister<T> deferredRegisterFor(Registry<T> objRegistry) {
+
+        if (objRegistry.key().location() == ForgeRegistries.Keys.ITEMS.location()) return (DeferredRegister<T>) ITEMS;
+        else if (objRegistry.key().location() == ForgeRegistries.Keys.BLOCKS.location()) return (DeferredRegister<T>) BLOCK;
+
+        throw new IllegalArgumentException("No registry linked in Forge module to register type: " + objRegistry.key());
+        // return null; // throws an error if registering to undefined/unlinked Forge registry
+    }
+}
+```
+
+Now we are set up to register blocks and items to Minecraft's built-in registries using each mod-loaders preferred method.
+Here's an example of a class that defines and registers our first item:
+```Java
+public class MyFirstItems {
+
+    public static final DeferredRegistryObject<Item> MY_FIRST_ITEM =
+            Services.PLATFORM.register(BuiltInRegistries.ITEM, "my_first_item",
+                    () -> new Item(new Item.Properties()));
+
+    public static void loadClass() {}
+}
+```
+
+In Fabric, our items will be registered as long as we call loadClass during mod initialization.
+But in Forge, we need to make sure we link our registries to the mod event bus provided by Forge.
+
+Assuming that you are calling `MyFirstItems#loadClass` within `MyFirstMod#init`:
+```Java
+@Mod(Constants.MOD_ID)
+public class MyFirstModForge {
+    
+    public MyFirstModForge() {
+
+        // calling init here calls loadClass in the classes we've defined.
+        // however, our ForgePlatformHelper is only adding our objects to Forge's deferred registries
+        MyFirstMod.init();
+
+        // here, we are linking our deferred registries to our mod event bus, so that Forge can handle registration for us.
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        ForgeRegistryHelper.BLOCK.register(modEventBus);
+        ForgeRegistryHelper.ITEMS.register(modEventBus);
+    }
+}
+```
