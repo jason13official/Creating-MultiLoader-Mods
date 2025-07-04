@@ -1,0 +1,34 @@
+package io.github.username.my_first_mod.core.util;
+
+import io.github.username.my_first_mod.Constants;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+/**
+ * Forge patches in their own registry wrappers, which we must utilize to ensure our objects are registered at the correct time and in the correct order. <br />
+ * This class simply provides a method to retrieve the appropriate registry, which should be attached to the IEventBus for our mod
+ * separately in the mod initializer.
+ */
+public class NeoForgeRegistryHelper {
+
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, Constants.MOD_ID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, Constants.MOD_ID);
+    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Constants.MOD_ID);
+
+    @SuppressWarnings("unchecked")
+    public static <T> DeferredRegister<T> deferredRegisterFor(Registry<T> objRegistry) {
+
+        if (objRegistry.key().location() == Registries.BLOCK.location()) return (DeferredRegister<T>) BLOCKS;
+        else if (objRegistry.key().location() == Registries.ITEM.location()) return (DeferredRegister<T>) ITEMS;
+        else if (objRegistry.key().location() == Registries.CREATIVE_MODE_TAB.location()) return (DeferredRegister<T>) TABS;
+
+        throw new IllegalArgumentException("No registry linked in Forge module to register type: " + objRegistry.key());
+        // return null; // throws an error if registering to undefined/unlinked Forge registry
+    }
+}
+
