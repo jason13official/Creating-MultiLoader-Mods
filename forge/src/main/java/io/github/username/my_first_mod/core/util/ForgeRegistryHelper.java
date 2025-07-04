@@ -2,7 +2,9 @@ package io.github.username.my_first_mod.core.util;
 
 import io.github.username.my_first_mod.Constants;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.DeferredRegister;
@@ -16,13 +18,15 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ForgeRegistryHelper {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Constants.MOD_ID);
-    public static final DeferredRegister<Block> BLOCK = DeferredRegister.create(ForgeRegistries.BLOCKS, Constants.MOD_ID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Constants.MOD_ID);
+    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Constants.MOD_ID);
 
     @SuppressWarnings("unchecked")
     public static <T> DeferredRegister<T> deferredRegisterFor(Registry<T> objRegistry) {
 
-        if (objRegistry.key().location() == ForgeRegistries.Keys.ITEMS.location()) return (DeferredRegister<T>) ITEMS;
-        else if (objRegistry.key().location() == ForgeRegistries.Keys.BLOCKS.location()) return (DeferredRegister<T>) BLOCK;
+        if (objRegistry.key().location() == ForgeRegistries.Keys.BLOCKS.location()) return (DeferredRegister<T>) BLOCKS;
+        else if (objRegistry.key().location() == ForgeRegistries.Keys.ITEMS.location()) return (DeferredRegister<T>) ITEMS;
+        else if (objRegistry.key().location() == Registries.CREATIVE_MODE_TAB.location()) return (DeferredRegister<T>) TABS;
 
         throw new IllegalArgumentException("No registry linked in Forge module to register type: " + objRegistry.key());
         // return null; // throws an error if registering to undefined/unlinked Forge registry

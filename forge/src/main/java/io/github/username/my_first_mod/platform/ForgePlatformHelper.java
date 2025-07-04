@@ -42,7 +42,7 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override @SuppressWarnings("unchecked")
     public <T, U extends T> DeferredRegistryObject<U> registerItem(String objName, Supplier<U> objSupplier) {
-        return this.<T, U>register((Registry<T>) ForgeRegistries.ITEMS, objName, objSupplier); // todo can we/should we use BuiltInRegistries.ITEM anyway?
+        return this.<T, U>register((Registry<T>) BuiltInRegistries.ITEM, objName, objSupplier);
     }
 
     @Override
