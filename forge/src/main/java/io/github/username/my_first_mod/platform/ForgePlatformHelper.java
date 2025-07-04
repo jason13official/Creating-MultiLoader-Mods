@@ -6,6 +6,7 @@ import io.github.username.my_first_mod.core.util.ForgeRegistryHelper;
 import io.github.username.my_first_mod.platform.services.IPlatformHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.DeferredRegister;
@@ -42,5 +43,10 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override @SuppressWarnings("unchecked")
     public <T, U extends T> DeferredRegistryObject<U> registerItem(String objName, Supplier<U> objSupplier) {
         return this.<T, U>register((Registry<T>) ForgeRegistries.ITEMS, objName, objSupplier); // todo can we/should we use BuiltInRegistries.ITEM anyway?
+    }
+
+    @Override
+    public CreativeModeTab.Builder tabBuilder() {
+        return CreativeModeTab.builder();
     }
 }

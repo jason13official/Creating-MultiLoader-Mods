@@ -6,7 +6,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
-public class MyFirstModBlocks {
+public class MyFirstBlocks {
 
     /**
      * Registering a new Block that can be supplied by our registry object when needed. <br />

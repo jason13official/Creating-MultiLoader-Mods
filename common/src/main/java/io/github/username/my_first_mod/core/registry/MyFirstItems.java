@@ -5,9 +5,8 @@ import io.github.username.my_first_mod.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 
-public class MyFirstModItems {
+public class MyFirstItems {
 
     /**
      * Registering a new Item that can be supplied by our registry object when needed. <br />
@@ -24,7 +23,7 @@ public class MyFirstModItems {
      */
     public static final DeferredRegistryObject<Item> MY_FIRST_BLOCK_ITEM =
             Services.PLATFORM.registerItem("my_first_block_item",
-                    () -> new BlockItem(MyFirstModBlocks.MY_FIRST_BLOCK.get(), new Item.Properties()));
+                    () -> new BlockItem(MyFirstBlocks.MY_FIRST_BLOCK.get(), new Item.Properties()));
 
     /**
      * Used for static-initialization of the contents of this class. <br />

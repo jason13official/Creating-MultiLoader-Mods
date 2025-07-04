@@ -2,6 +2,7 @@ package io.github.username.my_first_mod.platform.services;
 
 import io.github.username.my_first_mod.core.util.DeferredRegistryObject;
 import net.minecraft.core.Registry;
+import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.function.Supplier;
 
@@ -49,4 +50,6 @@ public interface IPlatformHelper {
      * Implementations should utilize {@link IPlatformHelper#register(Registry, String, Supplier)} with reference to {@link net.minecraft.core.registries.BuiltInRegistries#ITEM}
      */
     <T, U extends T> DeferredRegistryObject<U> registerItem(String objName, Supplier<U> objSupplier);
+
+    CreativeModeTab.Builder tabBuilder();
 }

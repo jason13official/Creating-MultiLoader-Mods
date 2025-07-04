@@ -4,11 +4,14 @@ import io.github.username.my_first_mod.Constants;
 import io.github.username.my_first_mod.core.util.DeferredRegistryObject;
 import io.github.username.my_first_mod.core.util.FabricDeferredRegistryObject;
 import io.github.username.my_first_mod.platform.services.IPlatformHelper;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.impl.itemgroup.FabricItemGroupBuilderImpl;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 
 import java.util.function.Supplier;
@@ -40,5 +43,10 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override @SuppressWarnings("unchecked")
     public <T, U extends T> DeferredRegistryObject<U> registerItem(String objName, Supplier<U> objSupplier) {
         return this.<T, U>register((Registry<T>) BuiltInRegistries.ITEM, objName, objSupplier);
+    }
+
+    @Override
+    public CreativeModeTab.Builder tabBuilder() {
+        return FabricItemGroup.builder();
     }
 }
