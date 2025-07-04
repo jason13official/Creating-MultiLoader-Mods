@@ -1,5 +1,10 @@
 package io.github.username.my_first_mod.platform.services;
 
+import io.github.username.my_first_mod.core.util.DeferredRegistryObject;
+import net.minecraft.core.Registry;
+
+import java.util.function.Supplier;
+
 public interface IPlatformHelper {
 
     /**
@@ -33,4 +38,15 @@ public interface IPlatformHelper {
 
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    /**
+     * Implementations should add objects to their appropriate registries, either by directly registering to the objRegistry parameter in Fabric,
+     * or getting the mod-linked registry from Forge using objRegistry's value.
+     */
+    <T, U extends T> DeferredRegistryObject<U> register(Registry<T> objRegistry, String objName, Supplier<U> objSupplier);
+
+    /**
+     * Implementations should utilize {@link IPlatformHelper#register(Registry, String, Supplier)} with reference to {@link net.minecraft.core.registries.BuiltInRegistries#ITEM}
+     */
+    <T, U extends T> DeferredRegistryObject<U> registerItem(String objName, Supplier<U> objSupplier);
 }

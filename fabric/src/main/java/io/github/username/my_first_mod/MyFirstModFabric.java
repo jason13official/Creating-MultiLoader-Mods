@@ -6,13 +6,9 @@ public class MyFirstModFabric implements ModInitializer {
     
     @Override
     public void onInitialize() {
-        
-        // This method is invoked by the Fabric mod loader when it is ready
-        // to load your mod. You can access Fabric and Common code in this
-        // project.
 
-        // Use Fabric to bootstrap the Common mod.
-        Constants.LOG.info("Hello Fabric world!");
+        // calling init here calls loadClass in the classes we've defined.
+        // since our FabricPlatformHelper is directly registering objects, we're done here.
         MyFirstMod.init();
     }
 }

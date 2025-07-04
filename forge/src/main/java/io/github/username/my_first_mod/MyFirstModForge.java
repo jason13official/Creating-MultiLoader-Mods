@@ -1,19 +1,22 @@
 package io.github.username.my_first_mod;
 
+import io.github.username.my_first_mod.core.util.ForgeRegistryHelper;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(Constants.MOD_ID)
 public class MyFirstModForge {
     
     public MyFirstModForge() {
-    
-        // This method is invoked by the Forge mod loader when it is ready
-        // to load your mod. You can access Forge and Common code in this
-        // project.
-    
-        // Use Forge to bootstrap the Common mod.
-        Constants.LOG.info("Hello Forge world!");
+
+        // calling init here calls loadClass in the classes we've defined.
+        // however, our ForgePlatformHelper is only adding our objects to Forge's deferred registries
         MyFirstMod.init();
-        
+
+        // here, we are linking our defined registries to our mod event bus, so that Forge can handle registration for us.
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        ForgeRegistryHelper.BLOCK.register(modEventBus);
+        ForgeRegistryHelper.ITEMS.register(modEventBus);
     }
 }
