@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
- * Forge patches in their own registry wrappers, which we must utilize to ensure our objects are registered at the correct time and in the correct order. <br />
+ * NeoForge patches in their own registry wrappers, which we must utilize to ensure our objects are registered at the correct time and in the correct order. <br />
  * This class simply provides a method to retrieve the appropriate registry, which should be attached to the IEventBus for our mod
  * separately in the mod initializer.
  */

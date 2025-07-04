@@ -3,7 +3,7 @@ package io.github.username.my_first_mod.core.util;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 /**
- * In Forge, our implementation of DeferredRegistryObject and usage of its inheritor ForgeDeferredRegistryObject
+ * In NeoForge, our implementation of DeferredRegistryObject and usage of its inheritor NeoForgeDeferredRegistryObject
  * is still straight-forward, but this class is holding a reference to Forge's holder for our registry object.
  * Retrieving the underlying object is still simple, we get the holder and then return the object.
  */
